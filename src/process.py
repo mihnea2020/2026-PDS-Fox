@@ -25,7 +25,7 @@ for file_name in image_filenames:
     img_rgb, img_gray = readImageFile(file_path)
 
     # hair removal
-    blackhat, thresh, img_out = removeHair(img_rgb, img_gray, kernel_size=25, threshold=10)
+    blackhat, thresh, img_out = removeHair(img_rgb, img_gray)
 
     # save the output image
     save_file_path = join(save_dir, f'processed_{file_name}')
