@@ -1,0 +1,13 @@
+HOG feature matrix shape: (117, 1764)
+
+HOG Logistic Regression 5-Fold CV:
+  Accuracy:    0.5989 ± 0.0531
+  ROC-AUC:     0.5302 ± 0.0868
+  Sensitivity: 0.6136 ± 0.1306
+  Specificity: 0.5924 ± 0.1619
+
+HOG Decision Tree 5-Fold CV:
+  Accuracy:    0.5149 ± 0.1751
+  ROC-AUC:     0.5253 ± 0.1946
+  Sensitivity: 0.5242 ± 0.2037
+  Specificity: 0.5045 ± 0.1820

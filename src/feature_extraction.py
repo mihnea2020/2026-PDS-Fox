@@ -9,6 +9,8 @@ from scipy import ndimage
 from skimage import color, measure, morphology, transform, util
 import imageio.v2 as imageio
 
+from utility.hair_util import hair_coverage, remove_hair
+
 IMG_EXT = (".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff")
 CANCER = {"BCC", "MEL", "SCC"}
 
@@ -120,12 +122,12 @@ def lab_colour_std(img, mask):
     return float(lab[mask].std(axis=0).mean())
 
 
-def hsv_features(img, mask):
+def hsv_features(img, mask, prefix=""):
     keys = ["mean_h", "mean_s", "mean_v", "std_h", "std_s", "std_v",
             "hue_entropy", "melanoma_colour_count"]
     pix = img[mask].astype(float) / 255.0
     if len(pix) == 0:
-        return {k: np.nan for k in keys}
+        return {prefix + k: np.nan for k in keys}
     hsv = color.rgb2hsv(pix.reshape(1, -1, 3)).reshape(-1, 3)
     hist, _ = np.histogram(hsv[:, 0], bins=30, range=(0, 1))
     prob = hist / max(hist.sum(), 1)
@@ -140,7 +142,7 @@ def hsv_features(img, mask):
         if close.mean() > 0.01:
             count += 1
     vals = [*hsv.mean(axis=0), *hsv.std(axis=0), entropy, float(count)]
-    return dict(zip(keys, [float(v) for v in vals]))
+    return dict(zip([prefix + k for k in keys], [float(v) for v in vals]))
 
 
 def bleeding_likelihood(img, mask):
@@ -164,6 +166,14 @@ def extract_features(img, mask):
         "bleeding_likelihood": bleeding_likelihood(img, mask),
     }
     feats.update(hsv_features(img, mask))
+    
+    cov = hair_coverage(img, mask)
+    feats["hair_coverage"] = cov
+    
+    clean_img = remove_hair(img, mask, cov)
+    feats["clean_lab_colour_std"] = lab_colour_std(clean_img, mask)
+    feats.update(hsv_features(clean_img, mask, prefix="clean_"))
+    
     return feats
 
 
@@ -186,18 +196,22 @@ def extract_all(images_dir, masks_dir, metadata_path, out_path, max_images=None)
                             "reason": "missing image" if img_path is None else "missing mask"})
             continue
         try:
-            img = _read_image(img_path)
-            mask = _read_mask(mask_path, img.shape[:2])
-            feat = extract_features(img, mask)
+            from preprocessing import preprocess_pair
+            img_n, mask_c = preprocess_pair(img_path, mask_path)
+            feat = extract_features(img_n, mask_c)
         except Exception as exc:
             skipped.append({"img_id": img_id, "reason": str(exc)})
             continue
-        record = {"img_id": img_id, "diagnostic": row["diagnostic"],
-                  "cancer_label": int(row["cancer_label"])}
-        for col in ["patient_id", "age", "gender", "region",
-                    "diameter_1", "diameter_2", "fitspatrick"]:
-            if col in meta.columns:
+            
+        record = {
+            "img_id": img_id,
+            "diagnostic": row["diagnostic"],
+            "cancer_label": int(row["cancer_label"])
+        }
+        for col in ["patient_id", "lesion_id", "age", "gender", "region", "diameter_1", "diameter_2"]:
+            if col in row:
                 record[col] = row[col]
+                
         record.update(feat)
         rows.append(record)
         if len(rows) % 100 == 0:
@@ -215,10 +229,10 @@ def extract_all(images_dir, masks_dir, metadata_path, out_path, max_images=None)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--images-dir", type=Path, default=Path("data/preprocessed/images"))
-    p.add_argument("--masks-dir",  type=Path, default=Path("data/preprocessed/masks"))
-    p.add_argument("--metadata",   type=Path, default=Path("data/metadata.csv"))
-    p.add_argument("--out",        type=Path, default=Path("results/features.csv"))
+    p.add_argument("--images-dir", type=Path, default=Path("data/imgs"))
+    p.add_argument("--masks-dir",  type=Path, default=Path("data/masks"))
+    p.add_argument("--metadata",   type=Path, default=Path("data/features.csv"))
+    p.add_argument("--out",        type=Path, default=Path("result/features.csv"))
     p.add_argument("--max-images", type=int,  default=None)
     a = p.parse_args()
     extract_all(a.images_dir, a.masks_dir, a.metadata, a.out, a.max_images)

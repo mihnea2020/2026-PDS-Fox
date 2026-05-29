@@ -1,0 +1,2 @@
+Manual Hair Fleiss' Kappa: 0.2940 (Observed: 77.26%, Expected: 67.80%, Prevalence: 20.17%)
+Manual Penmarks Consensus Prevalence: 24.79%

@@ -1,0 +1,37 @@
+Comparative Performance Table:
+
+Baseline Logistic Regression:
+  Accuracy:    71.79%
+  Sensitivity: 72.88%
+  Specificity: 70.69%
+  ROC-AUC:     0.7744
+
+Baseline Decision Tree:
+  Accuracy:    61.54%
+  Sensitivity: 64.41%
+  Specificity: 58.62%
+  ROC-AUC:     0.6404
+
+Extended Logistic Regression (confounded):
+  Accuracy:    69.23%
+  Sensitivity: 69.49%
+  Specificity: 68.97%
+  ROC-AUC:     0.7516
+
+Extended Decision Tree (confounded):
+  Accuracy:    64.96%
+  Sensitivity: 67.80%
+  Specificity: 62.07%
+  ROC-AUC:     0.5891
+
+Cleaned Logistic Regression (hair-removed):
+  Accuracy:    73.50%
+  Sensitivity: 72.88%
+  Specificity: 74.14%
+  ROC-AUC:     0.7870
+
+Cleaned Decision Tree (hair-removed):
+  Accuracy:    68.38%
+  Sensitivity: 62.71%
+  Specificity: 74.14%
+  ROC-AUC:     0.7319

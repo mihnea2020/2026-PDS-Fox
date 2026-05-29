@@ -1,0 +1,41 @@
+Cross-Validation Classification Results Summary:
+
+Baseline Logistic Regression:
+  Accuracy:    0.7181
+  Sensitivity: 0.7350
+  Specificity: 0.7228
+  ROC-AUC:     0.7820
+
+Baseline Decision Tree (depth=5):
+  Accuracy:    0.6348
+  Sensitivity: 0.6323
+  Specificity: 0.6020
+  ROC-AUC:     0.6177
+
+Shortcut Detector Agreement (Cohen's Kappa):
+  Hair Detector Kappa:    0.0021
+  Penmark Detector Kappa: 0.3067
+
+Extended Logistic Regression (confounded):
+  Accuracy:    0.6928
+  Sensitivity: 0.6986
+  Specificity: 0.7006
+  ROC-AUC:     0.7601
+
+Extended Decision Tree (confounded, depth=3):
+  Accuracy:    0.6518
+  Sensitivity: 0.6909
+  Specificity: 0.6020
+  ROC-AUC:     0.6205
+
+Cleaned Logistic Regression (hair-removed):
+  Accuracy:    0.7359
+  Sensitivity: 0.7311
+  Specificity: 0.7325
+  ROC-AUC:     0.7852
+
+Cleaned Decision Tree (hair-removed, depth=4):
+  Accuracy:    0.6851
+  Sensitivity: 0.6383
+  Specificity: 0.7410
+  ROC-AUC:     0.7090
